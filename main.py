@@ -31,11 +31,7 @@ def userInput():
         print()
         move = input("Player 1 where would you like to go? ")
 
-        if move == "":
-            return
-
-        if gameboard[int(move)] != " ":
-            print("Cannot go in that space.")
+        if validMove(move) == False:
             return
 
         player1Moves.append(move)
@@ -45,16 +41,28 @@ def userInput():
         print()
         move = input("Player 2 where would you like to go? ")
 
-        if move == "":
-            return
-
-        if gameboard[int(move)] != " ":
-            print("Cannot go in that space.")
+        if validMove(move) == False:
             return
 
         player2Moves.append(move)
         gameboard[int(move)] = "O"
         whosTurn = 1
+
+
+def validMove(move):
+    if move == "":
+        return False
+
+    if isinstance(move, str):
+        return False
+
+    if move > len(gameboard):
+        return False
+
+    if gameboard[int(move)] != " ":
+        print("Cannot go in that space.")
+        return False
+    return True
 
 
 def isGameOver():
@@ -114,7 +122,9 @@ def main():
         winner = isGameOver()
     clear()
     drawGameboard()
+    print()
     print(f"The winner is {winner}.")
+    print()
     print(f"Player 1's moves {player1Moves}")
     print(f"Player 2's moves {player2Moves}")
 
