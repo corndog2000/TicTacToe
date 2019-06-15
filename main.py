@@ -53,10 +53,7 @@ def validMove(move):
     if move == "":
         return False
 
-    if isinstance(move, str):
-        return False
-
-    if move > len(gameboard):
+    if int(move) > len(gameboard):
         return False
 
     if gameboard[int(move)] != " ":
@@ -127,6 +124,7 @@ def main():
     print()
     print(f"Player 1's moves {player1Moves}")
     print(f"Player 2's moves {player2Moves}")
+    
 
 
 if __name__ == '__main__':
