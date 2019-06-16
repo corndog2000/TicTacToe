@@ -4,62 +4,71 @@
 import random
 import os
 
+gameboard = []
+whosTurn = -1
+
 
 def clear():
     return os.system("cls")
 
 
-gameboard = [" ", " ", " ", " ", " ", " ", " ", " ", " "]
-player1Moves = []
-player2Moves = []
-whosTurn = 1
+class player(object):
 
-
-class player():
-    moves = []
-    moveCount = 0
-
-    def __init__(self):
+    def __init__(self, number):
         super().__init__()
+        self.number = number
+
+        if number % 2 is 0:
+            self.letter = "X"
+        else:
+            self.letter = "O"
+
+        self.moves = []
+        self.moveCount = 0
 
     def generateValidMove(self):
-        moves = self.moves
-
         i = True
-        while i == True:  # Keep going until it generates a random gameboard location that is empty
+        while i is True:  # Keep going until it generates a random gameboard location that is empty
             # Generates 1 random number from 0 to 8
             r = random.randint(0, 8)
             if gameboard[r] is " ":  # Is the randomly selected gameboard location empty?
-                moves.append(r)  # Add r to the player's moves list
+                self.moves.append(r)  # Add r to the player's moves list
                 i = False  # If it is then end the while loop because r is a valid number
-                print(f"Your new move is {r}")
+                #print(f"Your new move is {r}")
 
     def nextMove(self):
-        moves = self.moves
-        moveCount = self.moveCount
-
-        if len(moves) is 0:  # Is the player's moves empty
+        if len(self.moves) is 0:  # Is the player's moves empty
             self.generateValidMove()
 
         # Used to keep creating new moves if the moves list is empty.
-        if moves[moveCount] is None:
+        if len(self.moves) is self.moveCount:
             self.generateValidMove()
 
-        if len(moves) > 0:
-            moveCount = moveCount + 1
+        if len(self.moves) > 0:
+            self.moveCount = self.moveCount + 1
             # Return the next move from the list. This is the rightmost number in the list
-            return moves[len(moves) - 1]
+            return self.moves[len(self.moves) - 1]
 
 
-def drawGameboard():
+class game(object):
 
-    print(f" {gameboard[0]} │ {gameboard[1]} │ {gameboard[2]} ")
+    def __init__(self, winner=None, gameboard=[]):
+        super().__init__()
+        self.winner = winner
+        self.gameboard = gameboard
+
+
+def drawGameboard(gb):
+    # gb stands for gameboard
+
+    print(f" {gb[0]} │ {gb[1]} │ {gb[2]} ")
     print(u"───┼───┼───")
-    print(f" {gameboard[3]} │ {gameboard[4]} │ {gameboard[5]} ")
+    print(f" {gb[3]} │ {gb[4]} │ {gb[5]} ")
     print(u"───┼───┼───")
-    print(f" {gameboard[6]} │ {gameboard[7]} │ {gameboard[8]} ")
+    print(f" {gb[6]} │ {gb[7]} │ {gb[8]} ")
 
 
+'''
 def userInput():
     global whosTurn
 
@@ -84,6 +93,7 @@ def userInput():
         player2Moves.append(move)
         gameboard[int(move)] = "O"
         whosTurn = 1
+'''
 
 
 def playerInput(player1, player2):
@@ -100,7 +110,7 @@ def playerInput(player1, player2):
             return
 
         # player1Moves.append(move)
-        gameboard[int(move)] = "X"
+        gameboard[int(move)] = player1.letter
         whosTurn = 2
     elif whosTurn == 2:
         # print()
@@ -112,7 +122,7 @@ def playerInput(player1, player2):
             return
 
         # player2Moves.append(move)
-        gameboard[int(move)] = "O"
+        gameboard[int(move)] = player2.letter
         whosTurn = 1
 
 
@@ -130,50 +140,61 @@ def validMove(move):
 
 
 def isGameOver(player1, player2):
+    p1L = player1.letter
+    p2L = player2.letter
+
     # Rows
-    if gameboard[0] == "O" and gameboard[1] == "O" and gameboard[2] == "O":
-        player2
-    if gameboard[0] == "X" and gameboard[1] == "X" and gameboard[2] == "X":
-        player1
+    if gameboard[0] == p1L and gameboard[1] == p1L and gameboard[2] == p1L:
+        return player1
+    if gameboard[0] == p2L and gameboard[1] == p2L and gameboard[2] == p2L:
+        return player2
 
-    if gameboard[3] == "O" and gameboard[4] == "O" and gameboard[5] == "O":
-        player2
-    if gameboard[3] == "X" and gameboard[4] == "X" and gameboard[5] == "X":
-        player1
+    if gameboard[3] == p1L and gameboard[4] == p1L and gameboard[5] == p1L:
+        return player1
+    if gameboard[3] == p2L and gameboard[4] == p2L and gameboard[5] == p2L:
+        return player2
 
-    if gameboard[6] == "O" and gameboard[7] == "O" and gameboard[8] == "O":
-        player2
-    if gameboard[6] == "X" and gameboard[7] == "X" and gameboard[8] == "X":
-        player1
+    if gameboard[6] == p1L and gameboard[7] == p1L and gameboard[8] == p1L:
+        return player1
+    if gameboard[6] == p2L and gameboard[7] == p2L and gameboard[8] == p2L:
+        return player2
 
     # Columns
-    if gameboard[0] == "O" and gameboard[3] == "O" and gameboard[6] == "O":
-        player2
-    if gameboard[0] == "X" and gameboard[3] == "X" and gameboard[6] == "X":
-        player1
+    if gameboard[0] == p1L and gameboard[3] == p1L and gameboard[6] == p1L:
+        return player1
+    if gameboard[0] == p2L and gameboard[3] == p2L and gameboard[6] == p2L:
+        return player2
 
-    if gameboard[1] == "O" and gameboard[4] == "O" and gameboard[7] == "O":
-        player2
-    if gameboard[1] == "X" and gameboard[4] == "X" and gameboard[7] == "X":
-        player1
+    if gameboard[1] == p1L and gameboard[4] == p1L and gameboard[7] == p1L:
+        return player1
+    if gameboard[1] == p2L and gameboard[4] == p2L and gameboard[7] == p2L:
+        return player2
 
-    if gameboard[2] == "O" and gameboard[5] == "O" and gameboard[8] == "O":
-        player2
-    if gameboard[2] == "X" and gameboard[5] == "X" and gameboard[8] == "X":
-        player1
+    if gameboard[2] == p1L and gameboard[5] == p1L and gameboard[8] == p1L:
+        return player1
+    if gameboard[2] == p2L and gameboard[5] == p2L and gameboard[8] == p2L:
+        return player2
 
     # Diagonals
-    if gameboard[0] == "O" and gameboard[4] == "O" and gameboard[8] == "O":
-        player2
-    if gameboard[0] == "X" and gameboard[4] == "X" and gameboard[8] == "X":
-        player1
+    if gameboard[0] == p1L and gameboard[4] == p1L and gameboard[8] == p1L:
+        return player1
+    if gameboard[0] == p2L and gameboard[4] == p2L and gameboard[8] == p2L:
+        return player2
 
-    if gameboard[2] == "O" and gameboard[4] == "O" and gameboard[6] == "O":
-        player2
-    if gameboard[2] == "X" and gameboard[4] == "X" and gameboard[6] == "X":
-        player1
+    if gameboard[2] == p1L and gameboard[4] == p1L and gameboard[6] == p1L:
+        return player1
+    if gameboard[2] == p2L and gameboard[4] == p2L and gameboard[6] == p2L:
+        return player2
 
     return None
+
+
+def resetGame():
+    global gameboard
+    global whosTurn
+
+    gameboard = [" ", " ", " ", " ", " ", " ", " ", " ", " "]
+    whosTurn = random.randint(1, 2)
 
 
 def main():
@@ -182,8 +203,8 @@ def main():
 
     # Create the players
     # The number of players needs to be an even number
-    for i in range(2):
-        p = player()
+    for i in range(10):
+        p = player(i)
         playerList.append(p)
         print(f"Created player {i}")
 
@@ -192,27 +213,36 @@ def main():
         player1 = playerList[i]
         player2 = playerList[i + 1]
 
+        resetGame()
+
         winner = None
         while " " in gameboard and winner is None:
             clear()
-            drawGameboard()
+            drawGameboard(gameboard)
             # userInput()
             playerInput(player1, player2)
-            winner = (isGameOver(player1, player2))
+            winner = isGameOver(player1, player2)
         clear()
-        drawGameboard()
-        winners.append(winner)
-        print()
-        print(f"The winners are {winners}.")
-        print()
+        drawGameboard(gameboard)
 
-        j = 0
-        for p in playerList:
-            print(f"Player {j}'s moves {p}")
-            j = j + 1
+        if winner is not None:
+            winningGame = game(winner, gameboard)
+            winners.append(winningGame)
+            print()
+            print(f"The winners are: ")
+            for g in winners:
+                print(f"Player {g.winner.number} was {g.winner.letter} with moves {g.winner.moves}")
+                print()
+                drawGameboard(g.gameboard)
+                print()
+        else:
+            print()
+            print("There was no winner.")
 
-        #print(f"Player 1's moves {player1Moves}")
-        #print(f"Player 2's moves {player2Moves}")
+    print()
+    print("All the players: ")
+    for p in playerList:
+        print(f"Player {p.number} was {p.letter} with moves {p.moves}")
 
 
 if __name__ == '__main__':
