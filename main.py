@@ -3,9 +3,21 @@
 
 import random
 import os
+import argparse
 
 gameboard = []
 whosTurn = -1
+
+# Argument handler
+parser = argparse.ArgumentParser()
+
+parser.add_argument(
+    "--winners", help="Prints all the winning players and their moves along with their gameboard.", action="store_true")
+parser.add_argument(
+    "--players", help="Prints all the players and their moves", action="store_true")
+parser.add_argument("--games", help="How many game should be played", type=int)
+
+args = parser.parse_args()
 
 
 def clear():
@@ -203,7 +215,7 @@ def main():
 
     # Create the players
     # The number of players needs to be an even number
-    for i in range(10):
+    for i in range(args.games * 2):
         p = player(i)
         playerList.append(p)
         print(f"Created player {i}")
@@ -228,21 +240,22 @@ def main():
         if winner is not None:
             winningGame = game(winner, gameboard)
             winners.append(winningGame)
-            print()
-            print(f"The winners are: ")
-            for g in winners:
-                print(f"Player {g.winner.number} was {g.winner.letter} with moves {g.winner.moves}")
-                print()
-                drawGameboard(g.gameboard)
-                print()
-        else:
-            print()
-            print("There was no winner.")
 
-    print()
-    print("All the players: ")
-    for p in playerList:
-        print(f"Player {p.number} was {p.letter} with moves {p.moves}")
+    if args.players:
+        print()
+        print("All the players: ")
+        for p in playerList:
+            print(f"Player {p.number} was {p.letter} with moves {p.moves}")
+
+    if args.winners:
+        print()
+        print(f"The winners are: ")
+        for g in winners:
+            print(
+                f"Player {g.winner.number} was {g.winner.letter} with moves {g.winner.moves}")
+            print()
+            drawGameboard(g.gameboard)
+            print()
 
 
 if __name__ == '__main__':
