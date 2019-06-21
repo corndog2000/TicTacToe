@@ -4,8 +4,11 @@
 import random
 import os
 import argparse
+import csv
 
 gameboard = []
+playerList = []
+winners = []
 whosTurn = -1
 
 # Argument handler
@@ -22,6 +25,11 @@ args = parser.parse_args()
 
 def clear():
     return os.system("cls")
+
+
+def writeToFile(file, strategy, row, data):
+    with open(f"players/{file}.csv", "r+", newline='') as playerfile:
+        reader = csv.DictReader(playerfile)
 
 
 class player(object):
@@ -201,6 +209,42 @@ def isGameOver(player1, player2):
     return None
 
 
+def printPlayers():
+    print()
+    print("All the players: ")
+    for p in playerList:
+        print(f"Player {p.number} was {p.letter} with moves {p.moves}")
+
+
+def printWinners():
+    print()
+    print(f"The winners are: ")
+    for g in winners:
+        print(
+            f"Player {g.winner.number} was {g.winner.letter} with moves {g.winner.moves}")
+        print()
+        drawGameboard(g.gameboard)
+        print()
+
+    print(f"There were {len(winners)} winners.")
+    print(f"There were {args.games - len(winners)} tie games.")
+
+
+def createPlayers():
+    # Create the players
+    # The number of players needs to be an even number
+    for i in range(args.games * 2):
+        if not os.path.exists("players"):
+            os.makedirs("players")
+
+        file = open(f"players/player{i}.csv", "w+")
+        file.close()
+
+        p = player(i)
+        playerList.append(p)
+        print(f"Created player {i}")
+
+
 def resetGame():
     global gameboard
     global whosTurn
@@ -209,16 +253,8 @@ def resetGame():
     whosTurn = random.randint(1, 2)
 
 
-def main():
-    playerList = []
-    winners = []
-
-    # Create the players
-    # The number of players needs to be an even number
-    for i in range(args.games * 2):
-        p = player(i)
-        playerList.append(p)
-        print(f"Created player {i}")
+def playGame():
+    global winners
 
     # Play the games
     for i in range(0, len(playerList), 2):
@@ -241,21 +277,19 @@ def main():
             winningGame = game(winner, gameboard)
             winners.append(winningGame)
 
-    if args.players:
-        print()
-        print("All the players: ")
-        for p in playerList:
-            print(f"Player {p.number} was {p.letter} with moves {p.moves}")
 
+def main():
+    global playerList
+    global winners
+
+    createPlayers()
+
+    playGame()
+
+    if args.players:
+        printPlayers()
     if args.winners:
-        print()
-        print(f"The winners are: ")
-        for g in winners:
-            print(
-                f"Player {g.winner.number} was {g.winner.letter} with moves {g.winner.moves}")
-            print()
-            drawGameboard(g.gameboard)
-            print()
+        printWinners()
 
 
 if __name__ == '__main__':
