@@ -24,12 +24,40 @@ args = parser.parse_args()
 
 
 def clear():
-    return os.system("cls") 
+    return os.system("cls")
 
 
-def writeToFile(file, strategy, row, data):
-    with open(f"players/{file}.csv", "r+", newline='') as playerfile:
-        reader = csv.DictReader(playerfile)
+class strategyList(object):
+    def __init__(self, number):
+        super().__init__()
+        self.number = number
+        filename = (f"players/player{number}.csv")
+        self.filename = filename
+        self.strategies = []
+
+        # Create a new file for each player to store personalized data
+        stratFile = open(filename, "w+")
+        stratFile.close()
+
+    def loadFile(self):
+        with open(self.filename, "r") as stratFile:
+            reader = csv.reader(stratFile)
+            for row in reader:
+                self.strategies.append(row)
+
+    def saveFile(self):
+        with open(self.filename, "w") as stratFile:
+            writer = csv.writer(stratFile)
+            for row in self.strategies:
+                writer.writerow(row)
+
+    def createStrategy(self, moves=None, wins=0, losses=0):
+        self.loadFile()
+
+        newStrat = [moves, wins, losses]
+        self.strategies.append(newStrat)
+
+        self.saveFile()
 
 
 class player(object):
@@ -38,12 +66,8 @@ class player(object):
         super().__init__()
         self.number = number
 
-        ## Create a new file for each player to store personalized data
-        with open(f"players/player{number}.csv", "w+") as playerfile:
-            
-            fieldnames = ["number", "moves", "wins", "losses", "opponent's moves"]
-            writer = csv.DictWriter(playerfile, fieldnames = fieldnames)
-            writer.writeheader()
+        myStrats = strategyList(number)
+        self.myStrats = myStrats
 
         if number % 2 is 0:
             self.letter = "X"
@@ -280,6 +304,14 @@ def playGame():
         if winner is not None:
             winningGame = game(winner, gameboard)
             winners.append(winningGame)
+
+        # If the winner is player 1 then create a new stragety for player 1 and 2 but add a win for player 1 and a loss for player 2
+        if winner is player1:
+            player1.myStrats.createStrategy(player1.moves, 1, 0)
+            player2.myStrats.createStrategy(player2.moves, 0, 1)
+        elif winner is player2:
+            player1.myStrats.createStrategy(player1.moves, 0, 1)
+            player2.myStrats.createStrategy(player2.moves, 1, 0)
 
 
 def main():
