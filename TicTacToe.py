@@ -24,7 +24,7 @@ args = parser.parse_args()
 
 
 def clear():
-    return os.system("cls")
+    return os.system("cls") 
 
 
 def writeToFile(file, strategy, row, data):
@@ -37,6 +37,13 @@ class player(object):
     def __init__(self, number):
         super().__init__()
         self.number = number
+
+        ## Create a new file for each player to store personalized data
+        with open(f"players/player{number}.csv", "w+") as playerfile:
+            
+            fieldnames = ["number", "moves", "wins", "losses", "opponent's moves"]
+            writer = csv.DictWriter(playerfile, fieldnames = fieldnames)
+            writer.writeheader()
 
         if number % 2 is 0:
             self.letter = "X"
@@ -236,9 +243,6 @@ def createPlayers():
     for i in range(args.games * 2):
         if not os.path.exists("players"):
             os.makedirs("players")
-
-        file = open(f"players/player{i}.csv", "w+")
-        file.close()
 
         p = player(i)
         playerList.append(p)

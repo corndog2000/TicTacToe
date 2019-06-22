@@ -1,3 +1,3 @@
-python main.py --games 4 --winners
+python TicTacToe.py --games 4 --winners
 
 pause
