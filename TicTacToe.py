@@ -326,6 +326,9 @@ def playGame():
             winningGame = game(winner, gameboard)
             winners.append(winningGame)
 
+            with open("rawgameboard.txt", "a+") as f:
+                f.write(f"{str(gameboard)}\n")
+
         # If the winner is player 1 then create a new stragety for player 1 and 2 but add a win for player 1 and a loss for player 2
         player1.myStrats.createStrategy(player1.moves)
         player2.myStrats.createStrategy(player2.moves)
