@@ -27,6 +27,17 @@ def clear():
     return os.system("cls")
 
 
+class strategy(object):
+    def __init__(self, moves, wins, losses):
+        super().__init__()
+        self.moves = moves
+        self.wins = wins
+        self.losses = losses
+
+    def getWinPercentage(self):
+        return self.wins / (self.wins + self.losses)
+
+
 class strategyList(object):
     def __init__(self, number):
         super().__init__()
@@ -40,24 +51,32 @@ class strategyList(object):
         stratFile.close()
 
     def loadFile(self):
+        self.strategies = []
+
         with open(self.filename, "r") as stratFile:
             reader = csv.reader(stratFile)
             for row in reader:
-                self.strategies.append(row)
+                newStrat = strategy(row[0], row[1], row[2])
+                self.strategies.append(newStrat)
 
     def saveFile(self):
         with open(self.filename, "w") as stratFile:
             writer = csv.writer(stratFile)
-            for row in self.strategies:
-                writer.writerow(row)
+            for strategy in self.strategies:
+                writer.writerow(strategy.moves, strategy.wins, strategy.losses)
 
     def createStrategy(self, moves=None, wins=0, losses=0):
         self.loadFile()
 
-        newStrat = [moves, wins, losses]
+        newStrat = strategy(moves, wins, losses)
         self.strategies.append(newStrat)
 
         self.saveFile()
+
+    def getStragegy(self, number):
+        for strategy in self.strategies:
+            if strategy.number is number:
+                return strategy
 
 
 class player(object):
@@ -76,6 +95,7 @@ class player(object):
 
         self.moves = []
         self.moveCount = 0
+        self.currentStrategy = 0
 
     def generateValidMove(self):
         i = True
@@ -301,17 +321,18 @@ def playGame():
         clear()
         drawGameboard(gameboard)
 
+        # If there was a winner then add that player to the winners list
         if winner is not None:
             winningGame = game(winner, gameboard)
             winners.append(winningGame)
 
         # If the winner is player 1 then create a new stragety for player 1 and 2 but add a win for player 1 and a loss for player 2
+        player1.myStrats.createStrategy(player1.moves)
+        player2.myStrats.createStrategy(player2.moves)
+
         if winner is player1:
-            player1.myStrats.createStrategy(player1.moves, 1, 0)
-            player2.myStrats.createStrategy(player2.moves, 0, 1)
+
         elif winner is player2:
-            player1.myStrats.createStrategy(player1.moves, 0, 1)
-            player2.myStrats.createStrategy(player2.moves, 1, 0)
 
 
 def main():
