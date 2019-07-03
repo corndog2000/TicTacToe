@@ -1,3 +1,3 @@
-python TicTacToe.py --games 4 --winners
+python3 TicTacToe.py --games 1000
 
 pause

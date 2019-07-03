@@ -313,12 +313,12 @@ def playGame():
 
         winner = None
         while " " in gameboard and winner is None:
-            clear()
+            #clear()
             drawGameboard(gameboard)
             # userInput()
             playerInput(player1, player2)
             winner = isGameOver(player1, player2)
-        clear()
+        #clear()
         drawGameboard(gameboard)
 
         # If there was a winner then add that player to the winners list
@@ -330,12 +330,15 @@ def playGame():
                 f.write(f"{str(gameboard)}\n")
 
         # If the winner is player 1 then create a new stragety for player 1 and 2 but add a win for player 1 and a loss for player 2
+        
+        '''
         player1.myStrats.createStrategy(player1.moves)
         player2.myStrats.createStrategy(player2.moves)
 
         if winner is player1:
 
         elif winner is player2:
+        '''
 
 
 def main():
