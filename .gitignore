@@ -9,3 +9,6 @@ players/player5.txt
 players/player6.txt
 .vscode/settings.json
 .vscode/launch.json
+rawgameboard.txt
+rnnOutput.txt
+rnnOutput2.txt

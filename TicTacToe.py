@@ -5,6 +5,7 @@ import random
 import os
 import argparse
 import csv
+from time import process_time_ns
 
 gameboard = []
 playerList = []
@@ -19,6 +20,8 @@ parser.add_argument(
 parser.add_argument(
     "--players", help="Prints all the players and their moves", action="store_true")
 parser.add_argument("--games", help="How many game should be played", type=int)
+parser.add_argument("--count", help="Display the current game number", action="store_true")
+parser.add_argument("--board", help="Display the game board", action="store_true")
 
 args = parser.parse_args()
 
@@ -290,6 +293,7 @@ def createPlayers():
 
         p = player(i)
         playerList.append(p)
+        #clear()
         print(f"Created player {i}")
 
 
@@ -297,37 +301,60 @@ def resetGame():
     global gameboard
     global whosTurn
 
+    ## Clear the gameboard and randomly chose who will go first
     gameboard = [" ", " ", " ", " ", " ", " ", " ", " ", " "]
     whosTurn = random.randint(1, 2)
 
 
-def playGame():
+def playGame(drawBoard, drawCount):
     global winners
+    ## Variable to keep track of how many games we've played
+    if drawCount: n = 1
 
     # Play the games
     for i in range(0, len(playerList), 2):
+        
         player1 = playerList[i]
         player2 = playerList[i + 1]
 
         resetGame()
 
+        ## Play the game loop
+        if drawCount:
+            #clear()
+            print(f"Playing game #{n}")
         winner = None
         while " " in gameboard and winner is None:
-            #clear()
-            drawGameboard(gameboard)
-            # userInput()
+            if drawBoard:
+                clear()
+                drawGameboard(gameboard)
+            #userInput()
             playerInput(player1, player2)
             winner = isGameOver(player1, player2)
-        #clear()
-        drawGameboard(gameboard)
+        if drawBoard:
+            clear()
+            drawGameboard(gameboard)
+        if drawCount: n = n + 1
 
         # If there was a winner then add that player to the winners list
         if winner is not None:
             winningGame = game(winner, gameboard)
             winners.append(winningGame)
 
+            ## Create an output log file of the gameboard
+            ## An X is written as "1", an O is written as a "0", an empty space is written as a "-"
             with open("rawgameboard.txt", "a+") as f:
-                f.write(f"{str(gameboard)}\n")
+                toWrite = ""
+
+                for entry in gameboard:
+                    if entry is "X":
+                        toWrite = toWrite + "1"
+                    elif entry is "O":
+                        toWrite = toWrite + "0"
+                    else:
+                        toWrite = toWrite + "_"
+
+                f.write(f"{toWrite}\n")
 
         # If the winner is player 1 then create a new stragety for player 1 and 2 but add a win for player 1 and a loss for player 2
         
@@ -345,14 +372,25 @@ def main():
     global playerList
     global winners
 
+    t1 = process_time_ns()
     createPlayers()
+    elapsed_time1 = process_time_ns() - t1
 
-    playGame()
-
+    t2 = process_time_ns()
+    playGame(args.board, args.count)
+    elapsed_time2 = process_time_ns() - t2
+    
+    ## Print stuff when done
+    clear()
     if args.players:
         printPlayers()
     if args.winners:
         printWinners()
+
+    print()
+    print("***** Done *****")
+    print(f"Created players in {elapsed_time1 / 1e+9} seconds.")
+    print(f"Played all games in {elapsed_time2 / 1e+9} seconds.")
 
 
 if __name__ == '__main__':

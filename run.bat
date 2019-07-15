@@ -1,3 +1,3 @@
-python3 TicTacToe.py --games 1000
+python TicTacToe.py --games 10000 --count
 
 pause
