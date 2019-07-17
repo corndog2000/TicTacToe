@@ -29,6 +29,12 @@ args = parser.parse_args()
 def clear():
     return os.system("cls")
 
+class node(object):
+    def __init__(self):
+        super().__init__()
+        super.left = None
+        super.right = None
+        super.data = None
 
 class strategy(object):
     def __init__(self, moves, wins, losses):
