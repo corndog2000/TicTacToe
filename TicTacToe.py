@@ -5,6 +5,8 @@ import random
 import os
 import argparse
 import csv
+import json
+from TreeModel import Node, Model
 from time import process_time_ns
 
 gameboard = []
@@ -29,14 +31,7 @@ args = parser.parse_args()
 def clear():
     return os.system("cls")
 
-class node(object):
-    def __init__(self):
-        super().__init__()
-        super.left = None
-        super.right = None
-        super.data = None
-
-class strategy(object):
+class Strategy(object):
     def __init__(self, moves, wins, losses):
         super().__init__()
         self.moves = moves
@@ -47,7 +42,7 @@ class strategy(object):
         return self.wins / (self.wins + self.losses)
 
 
-class strategyList(object):
+class StrategyList(object):
     def __init__(self, number):
         super().__init__()
         self.number = number
@@ -65,7 +60,7 @@ class strategyList(object):
         with open(self.filename, "r") as stratFile:
             reader = csv.reader(stratFile)
             for row in reader:
-                newStrat = strategy(row[0], row[1], row[2])
+                newStrat = Strategy(row[0], row[1], row[2])
                 self.strategies.append(newStrat)
 
     def saveFile(self):
@@ -77,7 +72,7 @@ class strategyList(object):
     def createStrategy(self, moves=None, wins=0, losses=0):
         self.loadFile()
 
-        newStrat = strategy(moves, wins, losses)
+        newStrat = Strategy(moves, wins, losses)
         self.strategies.append(newStrat)
 
         self.saveFile()
@@ -94,8 +89,8 @@ class player(object):
         super().__init__()
         self.number = number
 
-        myStrats = strategyList(number)
-        self.myStrats = myStrats
+        #myStrats = strategyList(number)
+        #self.myStrats = myStrats
 
         if number % 2 is 0:
             self.letter = "X"
@@ -117,6 +112,9 @@ class player(object):
                 #print(f"Your new move is {r}")
 
     def nextMove(self):
+        ## ***************** Pick the best move from based on the model *****************
+        ## TODO
+        
         if len(self.moves) is 0:  # Is the player's moves empty
             self.generateValidMove()
 
@@ -128,7 +126,7 @@ class player(object):
             self.moveCount = self.moveCount + 1
             # Return the next move from the list. This is the rightmost number in the list
             return self.moves[len(self.moves) - 1]
-
+        
 
 class game(object):
 
