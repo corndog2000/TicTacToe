@@ -3,9 +3,11 @@ import json
 class Node(object):
     def __init__(self):
         super().__init__()
-        self.left = None
-        self.right = None
-        self.data = None
+        #self.left = None
+        #self.right = None
+        self.children = {}
+        self.rank = 0
+        self.board_pos = None
 
 class Model(object):
     def __init__(self):
