@@ -14,6 +14,9 @@ playerList = []
 winners = []
 whosTurn = -1
 
+## Decision Tree Model    
+ml = Model()
+
 # Argument handler
 parser = argparse.ArgumentParser()
 
@@ -111,9 +114,21 @@ class player(object):
                 i = False  # If it is then end the while loop because r is a valid number
                 #print(f"Your new move is {r}")
 
+    def findBestMove(self, level):
+        global ml
+
+
     def nextMove(self):
         ## ***************** Pick the best move from based on the model *****************
         ## TODO
+
+        global ml
+        
+        ## If the model is empty
+        if all(node == "-1" for node in ml.data):
+            
+
+        '''
         
         if len(self.moves) is 0:  # Is the player's moves empty
             self.generateValidMove()
@@ -126,6 +141,7 @@ class player(object):
             self.moveCount = self.moveCount + 1
             # Return the next move from the list. This is the rightmost number in the list
             return self.moves[len(self.moves) - 1]
+        '''
         
 
 class game(object):
