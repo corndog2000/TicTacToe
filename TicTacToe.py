@@ -114,8 +114,9 @@ class player(object):
                 i = False  # If it is then end the while loop because r is a valid number
                 #print(f"Your new move is {r}")
 
-    def findBestMove(self, level):
-        global ml
+    def findBestMove(self, node):
+        
+
 
 
     def nextMove(self):
