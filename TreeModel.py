@@ -16,6 +16,11 @@ class Model(object):
     def __init__(self):
         super().__init__()
         self.data = {"0": "0", "1": "0", "2": "0", "3": "0", "4": "0", "5": "0", "6": "0", "7": "0", "8": "0"}
+        
+        def initializeModel(node, size):
+            for i in range(size):
+                
+        
         for key, value in self.data.items():
             self.data[key] = Node(board_pos = int(key))
 
