@@ -19,7 +19,7 @@ class Model(object):
         
         def initializeModel(node, size):
             for i in range(size):
-                
+                z
         
         for key, value in self.data.items():
             self.data[key] = Node(board_pos = int(key))
