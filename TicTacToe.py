@@ -10,6 +10,7 @@ from TreeModel import Node, Model
 from time import process_time_ns
 
 gameboard = []
+global_moves = []
 playerList = []
 winners = []
 whosTurn = -1
@@ -114,10 +115,8 @@ class player(object):
                 i = False  # If it is then end the while loop because r is a valid number
                 #print(f"Your new move is {r}")
 
-    def findBestMove(self, node):
+    #def findBestMove(self, node):
         
-
-
 
     def nextMove(self):
         ## ***************** Pick the best move from based on the model *****************
@@ -125,12 +124,19 @@ class player(object):
 
         global ml
         
+        if global_moves is []:
+            for idx, node in ml.data:
+                highest_rank = 0
+                if node.rank > highest_rank:
+                    highest_rank = idx
+        
+        for mv in global_moves:
+
+
         ## If the model is empty
         if all(node == "-1" for node in ml.data):
             
-
         '''
-        
         if len(self.moves) is 0:  # Is the player's moves empty
             self.generateValidMove()
 
@@ -147,10 +153,11 @@ class player(object):
 
 class game(object):
 
-    def __init__(self, winner=None, gameboard=[]):
+    def __init__(self, winner=None, gameboard=[], global_moves=[]):
         super().__init__()
         self.winner = winner
         self.gameboard = gameboard
+        self.global_moves = global_moves
 
 
 def drawGameboard(gb):
@@ -206,6 +213,7 @@ def playerInput(player1, player2):
 
         # player1Moves.append(move)
         gameboard[int(move)] = player1.letter
+        global_moves.append(int(move))
         whosTurn = 2
     elif whosTurn == 2:
         # print()
@@ -218,6 +226,7 @@ def playerInput(player1, player2):
 
         # player2Moves.append(move)
         gameboard[int(move)] = player2.letter
+        global_moves.append(int(move))
         whosTurn = 1
 
 
@@ -293,7 +302,7 @@ def printPlayers():
 
 def printWinners():
     print()
-    print(f"The winners are: ")
+    print("The winners are: ")
     for g in winners:
         print(
             f"Player {g.winner.number} was {g.winner.letter} with moves {g.winner.moves}")
@@ -321,10 +330,12 @@ def createPlayers():
 def resetGame():
     global gameboard
     global whosTurn
+    global global_moves
 
     ## Clear the gameboard and randomly chose who will go first
     gameboard = [" ", " ", " ", " ", " ", " ", " ", " ", " "]
     whosTurn = random.randint(1, 2)
+    global_moves = []
 
 
 def playGame(drawBoard, drawCount):
@@ -359,7 +370,7 @@ def playGame(drawBoard, drawCount):
 
         # If there was a winner then add that player to the winners list
         if winner is not None:
-            winningGame = game(winner, gameboard)
+            winningGame = game(winner, gameboard, global_moves)
             winners.append(winningGame)
 
             ## Create an output log file of the gameboard
@@ -394,11 +405,11 @@ def main():
     global winners
 
     t1 = process_time_ns()
-    createPlayers()
+    createPlayers() #Create Players
     elapsed_time1 = process_time_ns() - t1
 
     t2 = process_time_ns()
-    playGame(args.board, args.count)
+    playGame(args.board, args.count)    #Play Game
     elapsed_time2 = process_time_ns() - t2
     
     ## Print stuff when done
