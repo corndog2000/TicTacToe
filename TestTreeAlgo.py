@@ -17,13 +17,30 @@ def main():
     global ml
 
     if global_moves is []:
-        for node in ml.data:
-            highest_rank = 0
-            if node.rank > highest_rank:
-                highest_rank = node.board_pos
 
-    for mv in global_moves:
-        
+
+
+    search = True
+    temp_moves = global_moves
+    current_node = ml.data
+
+    highest_rank = None
+    highest_rank_board_pos = None
+    
+    while search is True:
+        if len(temp_moves) == 0:
+            if all(value == 0 for value in current_node.values()):  # All of the children of the current node are 0
+
+            for pos in current_node:
+                if highest_rank == None or pos.rank > highest_rank:
+                    highest_rank = pos.rank
+                    highest_rank_board_pos = pos.board_pos
+
+            ## Stop looking for the best move
+            search = False
+            return highest_rank_board_pos
+        else:
+            
 
         # If the model is empty
     #if all(node == "-1" for node in ml.data):
