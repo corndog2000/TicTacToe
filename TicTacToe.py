@@ -143,7 +143,7 @@ class player(object):
             selection = best_node.board_pos
             # print("Highest Ranked Position: " + str(selection))
             r = random.randint(1, 100)
-            if r < 90:
+            if r < 60:
                 return selection
             else:
                 return nd.children[random.randint(0, len(nd.children) - 1)].board_pos
