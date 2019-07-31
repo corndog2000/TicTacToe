@@ -31,7 +31,7 @@ args = parser.parse_args()
 def clear():
     return os.system("cls")
 
-
+'''
 class Strategy(object):
     def __init__(self, moves, wins, losses):
         super().__init__()
@@ -82,7 +82,7 @@ class StrategyList(object):
         for strategy in self.strategies:
             if strategy.number is number:
                 return strategy
-
+'''
 
 class player(object):
 
