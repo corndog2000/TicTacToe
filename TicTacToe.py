@@ -143,7 +143,7 @@ class player(object):
             selection = best_node.board_pos
             # print("Highest Ranked Position: " + str(selection))
             r = random.randint(1, 100)
-            if r < 60:
+            if r < 90:
                 return selection
             else:
                 return nd.children[random.randint(0, len(nd.children) - 1)].board_pos
@@ -461,7 +461,7 @@ def main():
 
     t2 = process_time_ns()
     for i in range(args.games):
-        if i % 10000 == 0:
+        if i % (args.games / 100) == 0:
             print(f"Playing game #{i}")
             drawGameboard(
                 list(map(lambda n: n.rank, player1.ml.data.children)))
@@ -480,9 +480,10 @@ def main():
     # print(f"Created players in {elapsed_time1 / 1e+9} seconds.")
     print(f"Played all games in {elapsed_time2 / 1e+9} seconds.")
 
+    print()
+    print("Saving player models to files")
     player1.printModel()
     player2.printModel()
-
 
 if __name__ == '__main__':
     main()
