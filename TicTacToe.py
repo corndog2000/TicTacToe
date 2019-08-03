@@ -3,6 +3,8 @@ import os
 import argparse
 import csv
 import json
+import matplotlib.pyplot as plt 
+
 from TreeModel import Node, Model
 from time import process_time_ns
 
@@ -103,6 +105,7 @@ class player(object):
         self.currentStrategy = 0
         self.wins = 0
         self.losses = 0
+        self.ties = 0
 
         self.ml = Model()
         print(f"Created Model for player{number}")
@@ -129,19 +132,19 @@ class player(object):
                     # print(f"Found end: {nd.board_pos}")
 
         best_node = None
-        if all(n.rank == nd.children[0].rank for n in nd.children):
+        if all(n.rank() == nd.children[0].rank() for n in nd.children):
             selection = nd.children[random.randint(
                 0, len(nd.children) - 1)].board_pos
-            # print("Random Selection: " + str(selection))
+            #print("Random Selection: " + str(selection))
             return selection
 
         else:
             for i in nd.children:
-                if best_node == None or i.rank > best_node.rank:
+                if best_node == None or i.rank() > best_node.rank():
                     best_node = i
 
             selection = best_node.board_pos
-            # print("Highest Ranked Position: " + str(selection))
+            #print("Highest Ranked Position: " + str(selection))
             r = random.randint(1, 100)
             if r < 90:
                 return selection
@@ -162,9 +165,11 @@ class player(object):
             return self.moves[len(self.moves) - 1]
         '''
 
-    def updateModel(self, didIWin):
+    def updateModel(self, didIWin, didITie):
         if didIWin:
             self.wins = self.wins + 1
+        elif didITie:
+            self.ties = self.ties + 1
         else:
             self.losses = self.losses + 1
 
@@ -175,17 +180,18 @@ class player(object):
                     nd = c
 
                     if didIWin:
-                        nd.rank = nd.rank + 1
-                        nd.wins = nd.wins + 1
+                        #nd.rank = nd.rank + 1
+                        nd.win()
                     else:
-                        nd.rank = nd.rank - 1
-                        nd.losses = nd.losses + 1
-                    # print(f"Found end: {nd.board_pos}")
+                        #nd.rank = nd.rank - 1
+                        nd.loss()
+                    
 
     def printModel(self):
         with open(f"player{self.number}Model.txt", "w+", newline="", encoding="UTF-8") as printfile:
             printfile.write(f"Wins: {self.wins}\n")
             printfile.write(f"Losses: {self.losses}\n")
+            printfile.write(f"Ties: {self.ties}\n")
             printfile.write("\n")
             self.ml.printTree(self.ml.data, printfile, "")
 
@@ -354,8 +360,8 @@ def printWinners(player1, player2):
     print(f"There were {args.games - len(winners)} tie games.")
     '''
 
-    print(f"Player1 stats: Wins = {player1.wins}, Losses = {player1.losses}.")
-    print(f"Player2 stats: Wins = {player2.wins}, Losses = {player2.losses}.")
+    print(f"Player1 stats: Wins = {player1.wins}, Losses = {player1.losses}, Ties = {player1.ties}")
+    print(f"Player2 stats: Wins = {player2.wins}, Losses = {player2.losses}, Ties = {player2.ties}")
 
 
 def createPlayers():
@@ -402,8 +408,9 @@ def playGame(drawBoard, drawCount, player1, player2):
 
     # Tell the players if they won or lost to update their models
     # Ties count as a loss for both players
-    player1.updateModel(winner is player1)
-    player2.updateModel(winner is player2)
+    
+    player1.updateModel(winner is player1, winner is None)
+    player2.updateModel(winner is player2, winner is None)
 
     if False:
         if winner is not None:
@@ -459,13 +466,42 @@ def main():
     player1 = player(1)
     player2 = player(2)
 
+    x_axis = []
+    y_axis = [[] for _ in range(9)]
+
     t2 = process_time_ns()
     for i in range(args.games):
-        if i % (args.games / 100) == 0:
-            print(f"Playing game #{i}")
-            drawGameboard(
-                list(map(lambda n: n.rank, player1.ml.data.children)))
+        #if i % (args.games / 100) == 0:
+            #print(f"Playing game #{i}")
+            # Draw the gameboard with the rankings for each starting position
+            #drawGameboard(list(map(lambda n: n.rank(), player1.ml.data.children)))
+        # Graph the top level rankings
+        #tp.plot(player1.ml.data.children[0].rank())
+
+        x_axis.append(i)
+        for r in range(9):
+
+            #print(player1.ml.data.children[r].rank())
+            # adding rank values
+            y_axis[r].append(player1.ml.data.children[r].rank())
+
         playGame(args.board, args.count, player1, player2)  # Play Game
+
+    for u in range(9):
+        # plotting the points
+        plt.plot(x_axis, y_axis[u], label = f"Pos {u}")
+
+    # naming the x axis
+    plt.xlabel("Game")
+    # naming the y axis
+    plt.ylabel("Rank")
+
+    # show a legend on the plot
+    plt.legend()
+
+    # function to show the plot
+    plt.show()
+
     elapsed_time2 = process_time_ns() - t2
 
     # Print stuff when done

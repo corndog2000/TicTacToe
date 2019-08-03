@@ -1,18 +1,29 @@
 import json
 import os
 
-
 class Node(object):
     def __init__(self, rank=0, board_pos=None):
         super().__init__()
-        # self.left = None
-        # self.right = None
         self.children = []
-        self.rank = rank
+        #self.rank = rank()
         self.wins = 0
         self.losses = 0
         self.board_pos = board_pos
 
+    def win(self):
+        #print("Incrementing Wins")
+        self.wins += 1
+
+    def loss(self):
+        #print("Incrementing Losses")
+        self.losses += 1
+
+    def rank(self):
+        if self.wins == 0 or self.losses == 0:
+            return 0
+        else:
+            #print(f"Rank Function Output: {self.wins}, {self.losses}, {self.wins / self.losses}")
+            return self.wins / (self.wins + self.losses)
 
 class Model(object):
     path = "model.json"
@@ -73,7 +84,7 @@ class Model(object):
             to_write = to_write + str(node.board_pos)
         # if len(to_write) > 4 and (node.wins > 0 or node.losses > 0):
         path.write(
-            to_write + (f" ({node.rank}, {node.wins}, {node.losses})") + "\n")
+            to_write + (f" ({node.rank()}, {node.wins}, {node.losses})") + "\n")
         for i in node.children:
             self.printTree(i, path, to_write, level + 1, spaces)
 
@@ -101,3 +112,6 @@ class Model(object):
 
     def addBranch(self, moves):
         return True
+
+if __name__ == "__main__":
+    print("This is a helper library. It is not meant to be ran by itself.")
