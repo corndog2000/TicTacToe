@@ -3,7 +3,7 @@ import os
 import argparse
 import csv
 import json
-import matplotlib.pyplot as plt 
+import matplotlib.pyplot as plt
 
 from TreeModel import Node, Model
 from time import process_time_ns
@@ -32,6 +32,7 @@ args = parser.parse_args()
 
 def clear():
     return os.system("cls")
+
 
 '''
 class Strategy(object):
@@ -86,6 +87,7 @@ class StrategyList(object):
                 return strategy
 '''
 
+
 class player(object):
 
     def __init__(self, number):
@@ -107,8 +109,15 @@ class player(object):
         self.losses = 0
         self.ties = 0
 
-        self.ml = Model()
-        print(f"Created Model for player{number}")
+        self.model_name = (f"playerModel{self.number}")
+        self.ml = Model(self.model_name)
+
+        if os.path.exists(self.model_name):
+            print("Found model pickle file. Loading from disk.")
+            self.ml.loadModel(self.model_name)
+        else:
+            print("Model pickle not found in directory. Creating new model.")
+        print(f"Created Model for player{self.number}")
 
     def generateValidMove(self):
         i = True
@@ -185,7 +194,6 @@ class player(object):
                     else:
                         #nd.rank = nd.rank - 1
                         nd.loss()
-                    
 
     def printModel(self):
         with open(f"player{self.number}Model.txt", "w+", newline="", encoding="UTF-8") as printfile:
@@ -360,8 +368,10 @@ def printWinners(player1, player2):
     print(f"There were {args.games - len(winners)} tie games.")
     '''
 
-    print(f"Player1 stats: Wins = {player1.wins}, Losses = {player1.losses}, Ties = {player1.ties}")
-    print(f"Player2 stats: Wins = {player2.wins}, Losses = {player2.losses}, Ties = {player2.ties}")
+    print(
+        f"Player1 stats: Wins = {player1.wins}, Losses = {player1.losses}, Ties = {player1.ties}")
+    print(
+        f"Player2 stats: Wins = {player2.wins}, Losses = {player2.losses}, Ties = {player2.ties}")
 
 
 def createPlayers():
@@ -408,7 +418,7 @@ def playGame(drawBoard, drawCount, player1, player2):
 
     # Tell the players if they won or lost to update their models
     # Ties count as a loss for both players
-    
+
     player1.updateModel(winner is player1, winner is None)
     player2.updateModel(winner is player2, winner is None)
 
@@ -471,36 +481,26 @@ def main():
 
     t2 = process_time_ns()
     for i in range(args.games):
-        #if i % (args.games / 100) == 0:
-            #print(f"Playing game #{i}")
+        if i % (args.games / 1000) == 0:
+            print(f"Playing game #{i}")
+            # player1.ml.saveModel(player1.model_name)
+            # player2.ml.saveModel(player2.model_name)
             # Draw the gameboard with the rankings for each starting position
             #drawGameboard(list(map(lambda n: n.rank(), player1.ml.data.children)))
         # Graph the top level rankings
-        #tp.plot(player1.ml.data.children[0].rank())
+        # tp.plot(player1.ml.data.children[0].rank())
 
-        x_axis.append(i)
-        for r in range(9):
+            x_axis.append(i)
+            for r in range(9):
 
-            #print(player1.ml.data.children[r].rank())
-            # adding rank values
-            y_axis[r].append(player1.ml.data.children[r].rank())
+                # print(player1.ml.data.children[r].rank())
+                # adding rank values
+                y_axis[r].append(player1.ml.data.children[r].rank())
+
+            player1.ml.saveModel(player1.model_name)
+            player2.ml.saveModel(player2.model_name)
 
         playGame(args.board, args.count, player1, player2)  # Play Game
-
-    for u in range(9):
-        # plotting the points
-        plt.plot(x_axis, y_axis[u], label = f"Pos {u}")
-
-    # naming the x axis
-    plt.xlabel("Game")
-    # naming the y axis
-    plt.ylabel("Rank")
-
-    # show a legend on the plot
-    plt.legend()
-
-    # function to show the plot
-    plt.show()
 
     elapsed_time2 = process_time_ns() - t2
 
@@ -518,8 +518,28 @@ def main():
 
     print()
     print("Saving player models to files")
+    player1.ml.saveModel(player1.model_name)
+    player2.ml.saveModel(player2.model_name)
+
     player1.printModel()
     player2.printModel()
+
+    print("Creating matplot graph")
+    for u in range(9):
+        # plotting the points
+        plt.plot(x_axis, y_axis[u], label=f"Pos {u}")
+
+    # naming the x axis
+    plt.xlabel("Game")
+    # naming the y axis
+    plt.ylabel("Rank")
+
+    # show a legend on the plot
+    plt.legend()
+
+    # function to show the plot
+    plt.show()
+
 
 if __name__ == '__main__':
     main()

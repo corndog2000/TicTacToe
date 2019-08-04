@@ -1,5 +1,7 @@
-import json
+#import json
 import os
+import pickle
+
 
 class Node(object):
     def __init__(self, rank=0, board_pos=None):
@@ -25,13 +27,14 @@ class Node(object):
             #print(f"Rank Function Output: {self.wins}, {self.losses}, {self.wins / self.losses}")
             return self.wins / (self.wins + self.losses)
 
-class Model(object):
-    path = "model.json"
 
-    def __init__(self):
+class Model(object):
+
+    def __init__(self, path):
         super().__init__()
         # self.data = {"0": "0", "1": "0", "2": "0", "3": "0", "4": "0", "5": "0", "6": "0", "7": "0", "8": "0"}
         self.data = Node(board_pos=-1)
+        self.path = path
 
         # Recursive function
         def initializeModel(node, available_pos):
@@ -88,30 +91,28 @@ class Model(object):
         for i in node.children:
             self.printTree(i, path, to_write, level + 1, spaces)
 
-    def modelExists(self, path=path):
+    def modelExists(self, path):
         if os.path.exists(path):
             return True
         else:
             return False
 
-    def createModel(self, path=path):
-        with open(path, "w+") as new_model:
+    def createModel(self, path):
+        with open(path, "wb") as new_model:
             return True
 
-    def loadModel(self, path=path):
+    def loadModel(self, path):
         if not os.path.exists(path):
-            open(path, "w+").close()
+            open(path, "wb").close()
 
-        with open(path, "r") as read_file:
-            self.data = json.load(read_file)
+        with open(path, "rb") as read_file:
+            self.data = pickle.load(read_file)
             return self.data
 
-    def saveModel(self, path=path):
-        with open(path, "a+") as write_file:
-            json.dump(self.data, write_file)
+    def saveModel(self, path):
+        with open(path, "wb") as write_file:
+            pickle.dump(self.data, write_file)
 
-    def addBranch(self, moves):
-        return True
 
 if __name__ == "__main__":
     print("This is a helper library. It is not meant to be ran by itself.")
