@@ -1,12 +1,20 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+#Joseph Schroedl
+#joe.schroedl@outlook.com
+#https://github.com/corndog2000
+
 import random
 import os
 import argparse
 import csv
 import json
 import matplotlib.pyplot as plt
+import time
 
+from colorama import init, Fore
 from TreeModel import Node, Model
-from time import process_time_ns
 
 gameboard = []
 global_moves = []
@@ -26,6 +34,9 @@ parser.add_argument(
     "--count", help="Display the current game number", action="store_true")
 parser.add_argument(
     "--board", help="Display the game board", action="store_true")
+parser.add_argument("--user", help="Play against the computer", action="store_true")
+parser.add_argument("--sample_rate", help="How often should the program record the current top level move rankings for the matplot graph.", type=int)
+parser.add_argument("--save_rate", help="After how many games should the program save the players's models to disk.", type=int)
 
 args = parser.parse_args()
 
@@ -117,7 +128,7 @@ class player(object):
             self.ml.loadModel(self.model_name)
         else:
             print("Model pickle not found in directory. Creating new model.")
-        print(f"Created Model for player{self.number}")
+        print(Fore.GREEN + f"Created Model for player{self.number}" + Fore.WHITE)
 
     def generateValidMove(self):
         i = True
@@ -216,11 +227,18 @@ class game(object):
 def drawGameboard(gb):
     # gb stands for gameboard
 
-    print(f" {gb[0]} │ {gb[1]} │ {gb[2]} ")
+    colored_gb = gb.copy()
+    for i in range(9):
+        if colored_gb[i] == "X":
+            colored_gb[i] = (Fore.RED + "X" + Fore.WHITE)
+        elif colored_gb[i] == "O":
+            colored_gb[i] = (Fore.BLUE + "O" + Fore.WHITE)
+
+    print(f" {colored_gb[0]} │ {colored_gb[1]} │ {colored_gb[2]} ")
     print(u"───┼───┼───")
-    print(f" {gb[3]} │ {gb[4]} │ {gb[5]} ")
+    print(f" {colored_gb[3]} │ {colored_gb[4]} │ {colored_gb[5]} ")
     print(u"───┼───┼───")
-    print(f" {gb[6]} │ {gb[7]} │ {gb[8]} ")
+    print(f" {colored_gb[6]} │ {colored_gb[7]} │ {colored_gb[8]} ")
 
 
 '''
@@ -257,11 +275,13 @@ def playerInput(player1, player2):
     # Player 1's turn
     if whosTurn == 1:
         # print()
-        # move = input("Player 1 where would you like to go? ")
-        move = player1.nextMove()
+        if args.user:
+            move = input("Where would you like to go? ")
+        else:
+            move = player1.nextMove()
 
         if validMove(move) == False:
-            print("Player 1: ")
+            #print("Player 1: ")
             return
 
         # player1Moves.append(move)
@@ -269,12 +289,14 @@ def playerInput(player1, player2):
         global_moves.append(int(move))
         whosTurn = 2
     elif whosTurn == 2:
+        if args.user:
+            time.sleep(1)
         # print()
         # move = input("Player 2 where would you like to go? ")
         move = player2.nextMove()
 
         if validMove(move) == False:
-            print("Player 2: ")
+            #print("Player 2: ")
             return
 
         # player2Moves.append(move)
@@ -415,6 +437,14 @@ def playGame(drawBoard, drawCount, player1, player2):
     if drawBoard:
         clear()
         drawGameboard(gameboard)
+        
+        if args.user:
+            if winner is player1:
+                print("The winner is you!")
+            elif winner is player2:
+                print("The winner is the computer.")
+            elif winner is None:
+                print("The game is a draw.")
 
     # Tell the players if they won or lost to update their models
     # Ties count as a loss for both players
@@ -466,6 +496,18 @@ def main():
     global playerList
     global winners
 
+    if args.sample_rate is None:
+        sample_rate = 500
+    else:
+        sample_rate = args.sample_rate
+    if args.save_rate is None:
+        save_rate = 10000
+    else:
+        save_rate = args.save_rate
+
+    # initialize Colorama
+    init()
+
     '''
     t1 = process_time_ns()
     createPlayers()  # Create Players
@@ -477,11 +519,14 @@ def main():
     player2 = player(2)
 
     x_axis = []
-    y_axis = [[] for _ in range(9)]
+    y_axis_player1 = [[] for _ in range(9)]
+    y_axis_player2 = [[] for _ in range(9)]
 
-    t2 = process_time_ns()
-    for i in range(args.games):
-        if i % (args.games / 1000) == 0:
+    t2 = time.process_time_ns()
+    # Game counter variable
+    i = 0
+    while i < args.games:
+        if i % sample_rate == 0:
             print(f"Playing game #{i}")
             # player1.ml.saveModel(player1.model_name)
             # player2.ml.saveModel(player2.model_name)
@@ -495,14 +540,24 @@ def main():
 
                 # print(player1.ml.data.children[r].rank())
                 # adding rank values
-                y_axis[r].append(player1.ml.data.children[r].rank())
-
-            player1.ml.saveModel(player1.model_name)
-            player2.ml.saveModel(player2.model_name)
+                y_axis_player1[r].append(player1.ml.data.children[r].rank())
+                y_axis_player2[r].append(player2.ml.data.children[r].rank())
 
         playGame(args.board, args.count, player1, player2)  # Play Game
 
-    elapsed_time2 = process_time_ns() - t2
+        if i % save_rate == 0:
+            print(f"Saving player models every {save_rate} games")
+            player1.ml.saveModel(player1.model_name)
+            player2.ml.saveModel(player2.model_name)
+
+        if args.board and args.user: 
+            hold = input("Press ENTER to continue. Enter EXIT to quit playing.")
+            if "EXIT" in hold:
+                i = args.games
+
+        i += 1
+
+    elapsed_time2 = time.process_time_ns() - t2
 
     # Print stuff when done
     # clear()
@@ -524,22 +579,43 @@ def main():
     player1.printModel()
     player2.printModel()
 
-    print("Creating matplot graph")
+    print("Creating matplot graph for player 1")
+    plt.subplot(1, 2, 1)
+    
     for u in range(9):
         # plotting the points
-        plt.plot(x_axis, y_axis[u], label=f"Pos {u}")
+        plt.plot(x_axis, y_axis_player1[u], label=f"Player 1 Pos {u}")
 
     # naming the x axis
     plt.xlabel("Game")
+
     # naming the y axis
     plt.ylabel("Rank")
 
+    # creating the title
+    plt.title("Player 1 & Player 2 Move Rankings Over Time")
+
+    # show a legend on the plot
+    plt.legend()
+
+    print("Creating matplot graph for player 2")
+    plt.subplot(1, 2, 2)
+    
+    for u in range(9):
+        # plotting the points
+        plt.plot(x_axis, y_axis_player2[u], label=f"Player 2 Pos {u}")
+
+    # naming the x axis
+    plt.xlabel("Game")
+
+    # naming the y axis
+    plt.ylabel("Rank")
+    
     # show a legend on the plot
     plt.legend()
 
     # function to show the plot
     plt.show()
-
 
 if __name__ == '__main__':
     main()
