@@ -1,6 +1,8 @@
 # TicTacToe
 
 Dependencies:</br>
+Python version 3.6 or newer</br>
+
 pip install matplotlib</br>
 pip install colorama
 
