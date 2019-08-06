@@ -37,6 +37,7 @@ parser.add_argument(
 parser.add_argument("--user", help="Play against the computer", action="store_true")
 parser.add_argument("--sample_rate", help="How often should the program record the current top level move rankings for the matplot graph.", type=int)
 parser.add_argument("--save_rate", help="After how many games should the program save the players's models to disk.", type=int)
+parser.add_argument("--random", action="store_true")
 
 args = parser.parse_args()
 
@@ -151,25 +152,30 @@ class player(object):
                     nd = c
                     # print(f"Found end: {nd.board_pos}")
 
-        best_node = None
-        if all(n.rank() == nd.children[0].rank() for n in nd.children):
-            selection = nd.children[random.randint(
-                0, len(nd.children) - 1)].board_pos
-            #print("Random Selection: " + str(selection))
+        if args.random and self.number == 1:
+            selection = nd.children[random.randint(0, len(nd.children) - 1)].board_pos
             return selection
-
         else:
-            for i in nd.children:
-                if best_node == None or i.rank() > best_node.rank():
-                    best_node = i
 
-            selection = best_node.board_pos
-            #print("Highest Ranked Position: " + str(selection))
-            r = random.randint(1, 100)
-            if r < 90:
+            best_node = None
+            if all(n.rank() == nd.children[0].rank() for n in nd.children):
+                selection = nd.children[random.randint(
+                    0, len(nd.children) - 1)].board_pos
+                #print("Random Selection: " + str(selection))
                 return selection
+
             else:
-                return nd.children[random.randint(0, len(nd.children) - 1)].board_pos
+                for i in nd.children:
+                    if best_node == None or i.rank() > best_node.rank():
+                        best_node = i
+
+                selection = best_node.board_pos
+                #print("Highest Ranked Position: " + str(selection))
+                r = random.randint(1, 100)
+                if r < 90:
+                    return selection
+                else:
+                    return nd.children[random.randint(0, len(nd.children) - 1)].board_pos
 
         '''
         if len(self.moves) is 0:  # Is the player's moves empty
