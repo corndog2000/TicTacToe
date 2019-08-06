@@ -1,7 +1,7 @@
 # TicTacToe
 
-Dependencies:
-pip install matplotlib
+Dependencies:</br>
+pip install matplotlib</br>
 pip install colorama
 
 You can edit the batch file and change the number after —games for the number of games the program will play
