@@ -137,9 +137,10 @@ class player(object):
             # Generates 1 random number from 0 to 8
             r = random.randint(0, 8)
             if gameboard[r] is " ":  # Is the randomly selected gameboard location empty?
-                self.moves.append(r)  # Add r to the player's moves list
+                #self.moves.append(r)  # Add r to the player's moves list
                 i = False  # If it is then end the while loop because r is a valid number
                 # print(f"Your new move is {r}")
+                return r
 
     # def findBestMove(self, node):
 
@@ -153,8 +154,7 @@ class player(object):
                     # print(f"Found end: {nd.board_pos}")
 
         if args.random and self.number == 1:
-            selection = nd.children[random.randint(0, len(nd.children) - 1)].board_pos
-            return selection
+            return self.generateValidMove()
         else:
 
             best_node = None
@@ -166,16 +166,16 @@ class player(object):
 
             else:
                 for i in nd.children:
-                    if best_node == None or i.rank() > best_node.rank():
+                    if best_node == None or i.rank() < best_node.rank():
                         best_node = i
 
                 selection = best_node.board_pos
                 #print("Highest Ranked Position: " + str(selection))
-                r = random.randint(1, 100)
-                if r < 90:
-                    return selection
-                else:
-                    return nd.children[random.randint(0, len(nd.children) - 1)].board_pos
+                #r = random.randint(1, 100)
+                #if r < 90:
+                return selection
+                #else:
+                    #return nd.children[random.randint(0, len(nd.children) - 1)].board_pos
 
         '''
         if len(self.moves) is 0:  # Is the player's moves empty
@@ -528,11 +528,11 @@ def main():
     y_axis_player1 = [[] for _ in range(9)]
     y_axis_player2 = [[] for _ in range(9)]
 
-    t2 = time.process_time_ns()
+    #t2 = time.process_time_ns()
     # Game counter variable
     i = 0
     while i < args.games:
-        if i % sample_rate == 0:
+        if i % sample_rate == 0 and sample_rate > 0:
             print(f"Playing game #{i}")
             # player1.ml.saveModel(player1.model_name)
             # player2.ml.saveModel(player2.model_name)
@@ -563,7 +563,7 @@ def main():
 
         i += 1
 
-    elapsed_time2 = time.process_time_ns() - t2
+    #elapsed_time2 = time.process_time_ns() - t2
 
     # Print stuff when done
     # clear()
@@ -575,7 +575,7 @@ def main():
     print()
     print("***** Done *****")
     # print(f"Created players in {elapsed_time1 / 1e+9} seconds.")
-    print(f"Played all games in {elapsed_time2 / 1e+9} seconds.")
+    #print(f"Played all games in {elapsed_time2 / 1e+9} seconds.")
 
     print()
     print("Saving player models to files")
