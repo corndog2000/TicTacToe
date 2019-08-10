@@ -83,11 +83,12 @@ class Model(object):
             #to_write = (str(node.board_pos)) + (f" ({node.rank}, {node.wins}, {node.losses})") + "\n"
             path.write(to_write)
         '''
+
         if node.board_pos != -1:
             to_write = to_write + str(node.board_pos)
-        # if len(to_write) > 4 and (node.wins > 0 or node.losses > 0):
-        path.write(
-            to_write + (f" ({node.rank()}, {node.wins}, {node.losses})") + "\n")
+        
+        path.write(to_write + (f" ({node.rank()}, {node.wins}, {node.losses})") + "\n")
+        
         for i in node.children:
             self.printTree(i, path, to_write, level + 1, spaces)
 

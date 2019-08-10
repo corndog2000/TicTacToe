@@ -38,6 +38,7 @@ parser.add_argument("--user", help="Play against the computer", action="store_tr
 parser.add_argument("--sample_rate", help="How often should the program record the current top level move rankings for the matplot graph.", type=int)
 parser.add_argument("--save_rate", help="After how many games should the program save the players's models to disk.", type=int)
 parser.add_argument("--random", action="store_true")
+parser.add_argument("--model_name", type=str)
 
 args = parser.parse_args()
 
@@ -120,8 +121,12 @@ class player(object):
         self.wins = 0
         self.losses = 0
         self.ties = 0
+        
+        if args.model_name != None:
+            self.model_name = (f"playerModel{self.number}")
+        else:
+            self.model_name = (args.model_name + self.number)
 
-        self.model_name = (f"playerModel{self.number}")
         self.ml = Model(self.model_name)
 
         if os.path.exists(self.model_name):
@@ -213,7 +218,7 @@ class player(object):
                         nd.loss()
 
     def printModel(self):
-        with open(f"player{self.number}Model.txt", "w+", newline="", encoding="UTF-8") as printfile:
+        with open(f"playerModel{self.number}.txt", "w+", newline="", encoding="UTF-8") as printfile:
             printfile.write(f"Wins: {self.wins}\n")
             printfile.write(f"Losses: {self.losses}\n")
             printfile.write(f"Ties: {self.ties}\n")
@@ -503,11 +508,11 @@ def main():
     global winners
 
     if args.sample_rate is None:
-        sample_rate = 500
+        sample_rate = args.games / 1000
     else:
         sample_rate = args.sample_rate
     if args.save_rate is None:
-        save_rate = 10000
+        save_rate = args.games / 10
     else:
         save_rate = args.save_rate
 
