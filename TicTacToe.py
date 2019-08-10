@@ -122,7 +122,7 @@ class player(object):
         self.losses = 0
         self.ties = 0
         
-        if args.model_name != None:
+        if args.model_name == None:
             self.model_name = (f"playerModel{self.number}")
         else:
             self.model_name = (args.model_name + self.number)
