@@ -125,7 +125,7 @@ class player(object):
         if args.model_name == None:
             self.model_name = (f"playerModel{self.number}")
         else:
-            self.model_name = (args.model_name + self.number)
+            self.model_name = (str(args.model_name) + str(self.number))
 
         self.ml = Model(self.model_name)
 
