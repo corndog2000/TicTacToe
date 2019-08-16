@@ -1,2 +1,2 @@
-python TicTacToe.py --games 10000000 --count --winners --save_rate 10000000 --sample_rate -1000000
+python TicTacToe.py --games 1000000 --count --winners
 pause

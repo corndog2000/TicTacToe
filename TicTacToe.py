@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-#Joseph Schroedl
-#joe.schroedl@outlook.com
-#https://github.com/corndog2000
+# Joseph Schroedl
+# joe.schroedl@outlook.com
+# https://github.com/corndog2000
 
 import random
 import os
@@ -34,9 +34,12 @@ parser.add_argument(
     "--count", help="Display the current game number", action="store_true")
 parser.add_argument(
     "--board", help="Display the game board", action="store_true")
-parser.add_argument("--user", help="Play against the computer", action="store_true")
-parser.add_argument("--sample_rate", help="How often should the program record the current top level move rankings for the matplot graph.", type=int)
-parser.add_argument("--save_rate", help="After how many games should the program save the players's models to disk.", type=int)
+parser.add_argument(
+    "--user", help="Play against the computer", action="store_true")
+parser.add_argument(
+    "--sample_rate", help="How often should the program record the current top level move rankings for the matplot graph.", type=int)
+parser.add_argument(
+    "--save_rate", help="After how many games should the program save the players's models to disk.", type=int)
 parser.add_argument("--random", action="store_true")
 parser.add_argument("--model_name", type=str)
 
@@ -121,7 +124,7 @@ class player(object):
         self.wins = 0
         self.losses = 0
         self.ties = 0
-        
+
         if args.model_name == None:
             self.model_name = (f"playerModel{self.number}")
         else:
@@ -134,7 +137,8 @@ class player(object):
             self.ml.loadModel(self.model_name)
         else:
             print("Model pickle not found in directory. Creating new model.")
-        print(Fore.GREEN + f"Created Model for player{self.number}" + Fore.WHITE)
+        print(Fore.GREEN +
+              f"Created Model for player{self.number}" + Fore.WHITE)
 
     def generateValidMove(self):
         i = True
@@ -142,7 +146,7 @@ class player(object):
             # Generates 1 random number from 0 to 8
             r = random.randint(0, 8)
             if gameboard[r] is " ":  # Is the randomly selected gameboard location empty?
-                #self.moves.append(r)  # Add r to the player's moves list
+                # self.moves.append(r)  # Add r to the player's moves list
                 i = False  # If it is then end the while loop because r is a valid number
                 # print(f"Your new move is {r}")
                 return r
@@ -163,6 +167,8 @@ class player(object):
         else:
 
             best_node = None
+            
+            """
             if all(n.rank() == nd.children[0].rank() for n in nd.children):
                 selection = nd.children[random.randint(
                     0, len(nd.children) - 1)].board_pos
@@ -170,17 +176,22 @@ class player(object):
                 return selection
 
             else:
-                for i in nd.children:
-                    if best_node == None or i.rank() < best_node.rank():
-                        best_node = i
+            """
+            for i in nd.children:
+                # Next move choice logic
+                if i.wins == 0 and i.losses == 0:
+                    best_node = i
 
-                selection = best_node.board_pos
-                #print("Highest Ranked Position: " + str(selection))
-                #r = random.randint(1, 100)
-                #if r < 90:
-                return selection
-                #else:
-                    #return nd.children[random.randint(0, len(nd.children) - 1)].board_pos
+                elif best_node == None or i.rank() < best_node.rank():
+                    best_node = i
+
+            selection = best_node.board_pos
+            #print("Highest Ranked Position: " + str(selection))
+            #r = random.randint(1, 100)
+            # if r < 90:
+            return selection
+            # else:
+            # return nd.children[random.randint(0, len(nd.children) - 1)].board_pos
 
         '''
         if len(self.moves) is 0:  # Is the player's moves empty
@@ -442,13 +453,15 @@ def playGame(drawBoard, drawCount, player1, player2):
         if drawBoard:
             clear()
             drawGameboard(gameboard)
+            time.sleep(0.25)
         # userInput()
         playerInput(player1, player2)
         winner = isGameOver(player1, player2)
     if drawBoard:
         clear()
         drawGameboard(gameboard)
-        
+        time.sleep(0.25)
+
         if args.user:
             if winner is player1:
                 print("The winner is you!")
@@ -508,7 +521,7 @@ def main():
     global winners
 
     if args.sample_rate is None:
-        sample_rate = args.games / 1000
+        sample_rate = args.games / 100
     else:
         sample_rate = args.sample_rate
     if args.save_rate is None:
@@ -561,8 +574,9 @@ def main():
             player1.ml.saveModel(player1.model_name)
             player2.ml.saveModel(player2.model_name)
 
-        if args.board and args.user: 
-            hold = input("Press ENTER to continue. Enter EXIT to quit playing.")
+        if args.board and args.user:
+            hold = input(
+                "Press ENTER to continue. Enter EXIT to quit playing.")
             if "EXIT" in hold:
                 i = args.games
 
@@ -592,7 +606,7 @@ def main():
 
     print("Creating matplot graph for player 1")
     plt.subplot(1, 2, 1)
-    
+
     for u in range(9):
         # plotting the points
         plt.plot(x_axis, y_axis_player1[u], label=f"Player 1 Pos {u}")
@@ -611,7 +625,7 @@ def main():
 
     print("Creating matplot graph for player 2")
     plt.subplot(1, 2, 2)
-    
+
     for u in range(9):
         # plotting the points
         plt.plot(x_axis, y_axis_player2[u], label=f"Player 2 Pos {u}")
@@ -621,12 +635,13 @@ def main():
 
     # naming the y axis
     plt.ylabel("Rank")
-    
+
     # show a legend on the plot
     plt.legend()
 
     # function to show the plot
     plt.show()
+
 
 if __name__ == '__main__':
     main()
