@@ -13,14 +13,22 @@ import json
 import matplotlib.pyplot as plt
 import time
 
+import numba
+from numba import jit
+
 from colorama import init, Fore
 from TreeModel import Node, Model
+
 
 gameboard = []
 global_moves = []
 playerList = []
 winners = []
 whosTurn = -1
+
+# Variables needed for formatting the csv output file
+header_check = False
+write_header = True
 
 # Argument handler
 parser = argparse.ArgumentParser()
@@ -168,7 +176,7 @@ class player(object):
 
             best_node = None
             
-            """
+
             if all(n.rank() == nd.children[0].rank() for n in nd.children):
                 selection = nd.children[random.randint(
                     0, len(nd.children) - 1)].board_pos
@@ -176,22 +184,21 @@ class player(object):
                 return selection
 
             else:
-            """
-            for i in nd.children:
-                # Next move choice logic
-                if i.wins == 0 and i.losses == 0:
-                    best_node = i
+                for i in nd.children:
+                    # Next move choice logic
+                    #if i.wins == 0 and i.losses == 0:
+                    #    best_node = i
 
-                elif best_node == None or i.rank() < best_node.rank():
-                    best_node = i
+                    if best_node == None or i.rank() < best_node.rank():
+                        best_node = i
 
-            selection = best_node.board_pos
-            #print("Highest Ranked Position: " + str(selection))
-            #r = random.randint(1, 100)
-            # if r < 90:
-            return selection
-            # else:
-            # return nd.children[random.randint(0, len(nd.children) - 1)].board_pos
+                selection = best_node.board_pos
+                #print("Highest Ranked Position: " + str(selection))
+                r = random.randint(1, 100)
+                if r < 50:
+                    return selection
+                else:
+                    return nd.children[random.randint(0, len(nd.children) - 1)].board_pos
 
         '''
         if len(self.moves) is 0:  # Is the player's moves empty
@@ -444,6 +451,8 @@ def resetGame():
 
 def playGame(drawBoard, drawCount, player1, player2):
     global winners
+    global header_check
+    global write_header
 
     resetGame()
 
@@ -476,18 +485,69 @@ def playGame(drawBoard, drawCount, player1, player2):
     player1.updateModel(winner is player1, winner is None)
     player2.updateModel(winner is player2, winner is None)
 
+    """
     if False:
         if winner is not None:
             drawGameboard(gameboard)
             print(global_moves)
             print()
+    """
 
-    '''
+    
     # If there was a winner then add that player to the winners list
     if winner is not None:
         winningGame = game(winner, gameboard, global_moves)
         winners.append(winningGame)
 
+        if True:
+            # Look for the header so we don't have to write it again
+            if header_check:
+                with open("winning_games.csv", "r", newline='') as csvfile:
+                    reader = csv.DictReader(csvfile)
+
+                    #if reader.fieldnames == None:
+                    #    write_header = True
+
+                    if next(reader) != None:
+                        write_header = True
+
+                header_check = False
+            
+            else:
+
+                with open("winning_games.csv", "a+", newline='') as csvfile:
+                    fieldnames = ["move0", "move1", "move2", "move3", "move4", "move5","move6","move7","move8","winner"]
+                    writer = csv.DictWriter(csvfile, fieldnames = fieldnames)
+
+                    
+                    if write_header:
+                        writer.writeheader()
+                        write_header = False
+                    
+
+                    new_row = ["None"] * 10
+                    for i in range(9):
+                        if i >= len(global_moves):
+                            new_row[i] = ""
+                        elif global_moves[i] == None:
+                            new_row[i] = ""
+                        else:
+                            new_row[i] = global_moves[i]
+
+                    writer.writerow({
+                        "move0": new_row[0], 
+                        "move1": new_row[1], 
+                        "move2": new_row[2], 
+                        "move3": new_row[3], 
+                        "move4": new_row[4], 
+                        "move5": new_row[5], 
+                        "move6": new_row[6], 
+                        "move7": new_row[7], 
+                        "move8": new_row[8], 
+                        "winner": winner.letter})
+
+
+        """
         # Create an output log file of the gameboard
         # An X is written as "1", an O is written as a "0", an empty space is written as a "-"
         with open("rawgameboard.txt", "a+") as f:
@@ -499,10 +559,10 @@ def playGame(drawBoard, drawCount, player1, player2):
                 elif entry is "O":
                     toWrite = toWrite + "0"
                 else:
-                    toWrite = toWrite + "_"
+                    toWrite = toWrite + "2"
 
             f.write(f"{toWrite}\n")
-    '''
+        """
 
     '''
     # If the winner is player 1 then create a new stragety for player 1 and 2 but add a win for player 1 and a loss for player 2
